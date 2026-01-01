@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <title>*** GAME IDEA GENERATOR 2000 ***</title>
     <style>
-        /* 90s Retro Styles */
         body { 
-            background-color: #c0c0c0; /* Classic Classic Grey */
+            background-color: #c0c0c0; 
             font-family: "Times New Roman", Times, serif;
             color: #000;
             padding: 20px;
@@ -17,107 +16,112 @@
             border-color: #ffffff #808080 #808080 #ffffff;
             padding: 15px;
             background: #c0c0c0;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: left;
         }
-        .section-title { font-weight: bold; font-size: 1.2rem; color: #800000; }
+        .section-title { font-weight: bold; font-size: 1.1rem; color: #800000; display: block; margin-bottom: 5px; }
         .list-preview { 
             background: #fff; 
-            border: 1px inset #808080; 
-            font-size: 0.8rem; 
-            padding: 5px; 
-            margin: 5px 0;
-            max-height: 50px;
-            overflow-y: auto;
+            border: 2px inset #808080; 
+            font-size: 0.9rem; 
+            padding: 8px; 
+            margin: 8px 0;
+            min-height: 20px;
         }
+        .radio-group { padding: 5px; border: 1px dashed #808080; margin-bottom: 10px; }
         button {
             background: #c0c0c0;
             border: 2px solid;
             border-color: #ffffff #404040 #404040 #ffffff;
             cursor: pointer;
-            padding: 5px 10px;
+            padding: 4px 12px;
+            font-family: "Times New Roman";
             font-weight: bold;
         }
         button:active { border-color: #404040 #ffffff #ffffff #404040; }
-        input[type="text"] { border: 2px inset #ffffff; padding: 3px; width: 80%; }
+        input[type="text"] { border: 2px inset #ffffff; padding: 3px; width: 70%; }
         #final-result {
             background: #000080;
             color: #ffff00;
             padding: 20px;
             border: 4px double #ffffff;
-            font-size: 1.5rem;
-            display: none; /* Hidden until generated */
+            font-size: 1.4rem;
+            display: none;
             margin-top: 20px;
         }
-        marquee { border: 1px solid #000; background: #fff; margin-bottom: 10px; }
+        .footer-links { margin-top: 30px; font-size: 0.8rem; border-top: 1px solid #000; padding-top: 10px; }
     </style>
 </head>
 <body>
 
-    <marquee>WELCOME TO THE ULTIMATE GAME IDEA GENERATOR! OPTIMIZED FOR NETSCAPE NAVIGATOR 4.0</marquee>
-    
-    <h1>Game Project Generator</h1>
+    <h1>Game Idea Generator v1.0</h1>
 
     <div class="win-panel">
-        <span class="section-title">1. Dimension Type</span><br>
-        <select id="typeSelect">
-            <option value="Text-Based">Text-Based</option>
-            <option value="2D">2D</option>
-            <option value="3D">3D</option>
-        </select>
+        <span class="section-title">I. Select Dimension Pool</span>
+        <div class="radio-group">
+            <input type="radio" name="type" id="t1" value="Text-Based" checked> <label for="t1">Text-Based</label><br>
+            <input type="radio" name="type" id="t2" value="2D"> <label for="t2">2D Graphics</label><br>
+            <input type="radio" name="type" id="t3" value="3D"> <label for="t3">3D Environment</label>
+        </div>
+        <small>* Select one dimension for the final output.</small>
     </div>
 
     <div class="win-panel">
-        <span class="section-title">2. Genres</span><br>
-        <div class="list-preview" id="genreDisplay"></div>
-        <input type="text" id="genreInput" placeholder="Enter genres separated by commas...">
-        <button onclick="addItems('genre')">Add to List</button>
-        <br><br>
-        <input type="checkbox" id="disableDefaultGenre"> <label for="disableDefaultGenre">Disable Default Genres</label>
+        <span class="section-title">II. Genre Pool Management</span>
+        <div class="list-preview" id="genreDisplay">Loading pool...</div>
+        <input type="text" id="genreInput" placeholder="Add genres (comma separated)...">
+        <button onclick="addItems('genre')">Update Pool</button>
+        <div style="margin-top:10px;">
+            <input type="checkbox" id="disableDefaultGenre"> <label for="disableDefaultGenre">EXCLUDE DEFAULT GENRES</label>
+        </div>
     </div>
 
     <div class="win-panel">
-        <span class="section-title">3. Themes</span><br>
-        <div class="list-preview" id="themeDisplay"></div>
-        <input type="text" id="themeInput" placeholder="Space, Horror, Noir...">
-        <button onclick="addItems('theme')">Add to List</button>
-        <br><br>
-        <input type="checkbox" id="disableDefaultTheme"> <label for="disableDefaultTheme">Disable Default Themes</label>
+        <span class="section-title">III. Theme Pool Management</span>
+        <div class="list-preview" id="themeDisplay">Loading pool...</div>
+        <input type="text" id="themeInput" placeholder="Add themes (comma separated)...">
+        <button onclick="addItems('theme')">Update Pool</button>
+        <div style="margin-top:10px;">
+            <input type="checkbox" id="disableDefaultTheme"> <label for="disableDefaultTheme">EXCLUDE DEFAULT THEMES</label>
+        </div>
     </div>
 
-    <button style="font-size: 1.5rem; width: 100%; height: 50px;" onclick="generateIdea()">
-        GENERATE MY GAME IDEA!
-    </button>
+    <div style="text-align:center;">
+        <button style="font-size: 1.2rem; padding: 10px 40px;" onclick="generateIdea()">
+            [ COMPUTE IDEA ]
+        </button>
+    </div>
 
     <div id="final-result">
-        *** YOUR GAME IDEA ***<br>
+        <strong>*** CALCULATION COMPLETE ***</strong><br><br>
         <span id="output-text"></span>
     </div>
 
-    <p align="center">
-        <a href="index.html">Click here to go back to Homepage</a>
-    </p>
+    <div class="footer-links">
+        <button onclick="clearData()" style="font-size: 0.7rem; background: #ffcccc;">Reset All Custom Data</button>
+        <br><br>
+        <a href="index.html">RETURN TO MAIN MENU</a> | 
+        <a href="#">TOP OF PAGE</a>
+    </div>
 
     <script>
-        // Data
-        let defaultGenres = ["Metroidvania", "Soulslike", "Farm Sim", "Puzzler", "Bullet Hell"];
-        let defaultThemes = ["Cyberpunk", "Medieval", "Underwater", "Deep Space", "Post-Apocalyptic"];
+        const defaultGenres = ["Metroidvania", "Soulslike", "Farm Sim", "Puzzler", "Bullet Hell"];
+        const defaultThemes = ["Cyberpunk", "Medieval", "Underwater", "Deep Space", "Post-Apocalyptic"];
 
         let userGenres = JSON.parse(localStorage.getItem('userGenres')) || [];
         let userThemes = JSON.parse(localStorage.getItem('userThemes')) || [];
 
-        // Refresh displays on load
         updatePreviews();
 
         function addItems(category) {
             const input = document.getElementById(category + 'Input');
-            const newItems = input.value.split(',').map(item => item.trim()).filter(item => item !== "");
+            const items = input.value.split(',').map(i => i.trim()).filter(i => i !== "");
             
             if (category === 'genre') {
-                userGenres = [...userGenres, ...newItems];
+                userGenres = [...userGenres, ...items];
                 localStorage.setItem('userGenres', JSON.stringify(userGenres));
             } else {
-                userThemes = [...userThemes, ...newItems];
+                userThemes = [...userThemes, ...items];
                 localStorage.setItem('userThemes', JSON.stringify(userThemes));
             }
             
@@ -126,40 +130,43 @@
         }
 
         function updatePreviews() {
-            document.getElementById('genreDisplay').innerText = "Current Pool: " + 
-                ([...(document.getElementById('disableDefaultGenre').checked ? [] : defaultGenres), ...userGenres]).join(', ');
-            
-            document.getElementById('themeDisplay').innerText = "Current Pool: " + 
-                ([...(document.getElementById('disableDefaultTheme').checked ? [] : defaultThemes), ...userThemes]).join(', ');
+            const showDefaultGenre = !document.getElementById('disableDefaultGenre').checked;
+            const fullGenreList = [...(showDefaultGenre ? defaultGenres : []), ...userGenres];
+            document.getElementById('genreDisplay').innerHTML = "<strong>Current Pool:</strong> " + (fullGenreList.join(', ') || "<em>(Empty)</em>");
+
+            const showDefaultTheme = !document.getElementById('disableDefaultTheme').checked;
+            const fullThemeList = [...(showDefaultTheme ? defaultThemes : []), ...userThemes];
+            document.getElementById('themeDisplay').innerHTML = "<strong>Current Pool:</strong> " + (fullThemeList.join(', ') || "<em>(Empty)</em>");
         }
 
         function generateIdea() {
-            const type = document.getElementById('typeSelect').value;
-
-            // Determine Genre Pool
-            const useOnlyUserGenre = document.getElementById('disableDefaultGenre').checked;
-            const genrePool = useOnlyUserGenre ? userGenres : [...defaultGenres, ...userGenres];
-
-            // Determine Theme Pool
-            const useOnlyUserTheme = document.getElementById('disableDefaultTheme').checked;
-            const themePool = useOnlyUserTheme ? userThemes : [...defaultThemes, ...userThemes];
+            const type = document.querySelector('input[name="type"]:checked').value;
+            
+            const genrePool = [...(!document.getElementById('disableDefaultGenre').checked ? defaultGenres : []), ...userGenres];
+            const themePool = [...(!document.getElementById('disableDefaultTheme').checked ? defaultThemes : []), ...userThemes];
 
             if (genrePool.length === 0 || themePool.length === 0) {
-                alert("Error: Your lists are empty! Please add or enable some items.");
+                alert("SYSTEM ERROR: Pools cannot be empty.");
                 return;
             }
 
-            const randGenre = genrePool[Math.floor(Math.random() * genrePool.length)];
-            const randTheme = themePool[Math.floor(Math.random() * themePool.length)];
+            const resGenre = genrePool[Math.floor(Math.random() * genrePool.length)];
+            const resTheme = themePool[Math.floor(Math.random() * themePool.length)];
 
-            const resultBox = document.getElementById('final-result');
-            const resultText = document.getElementById('output-text');
-            
-            resultBox.style.display = "block";
-            resultText.innerHTML = `A ${type} ${randGenre} game set in a ${randTheme} world.`;
+            document.getElementById('final-result').style.display = "block";
+            document.getElementById('output-text').innerText = `RESULT: A ${type} ${resGenre} game with a ${resTheme} theme.`;
+            window.scrollTo(0, document.body.scrollHeight);
         }
 
-        // Add event listeners to checkboxes to update previews instantly
+        function clearData() {
+            if(confirm("Are you sure you want to delete all custom added items?")) {
+                localStorage.clear();
+                userGenres = [];
+                userThemes = [];
+                updatePreviews();
+            }
+        }
+
         document.getElementById('disableDefaultGenre').addEventListener('change', updatePreviews);
         document.getElementById('disableDefaultTheme').addEventListener('change', updatePreviews);
     </script>
