@@ -2,56 +2,166 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genre Generator</title>
+    <title>*** GAME IDEA GENERATOR 2000 ***</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; text-align: center; }
-        .box { background: white; max-width: 400px; margin: 20px auto; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
-        #result { font-size: 1.5rem; font-weight: bold; color: #007bff; margin: 20px 0; min-height: 1.6em; }
-        input { padding: 8px; width: 60%; border: 1px solid #ccc; border-radius: 4px; }
-        button { padding: 8px 15px; margin: 5px; cursor: pointer; }
-        .back-link { display: block; margin-top: 20px; color: #666; text-decoration: none; }
+        /* 90s Retro Styles */
+        body { 
+            background-color: #c0c0c0; /* Classic Classic Grey */
+            font-family: "Times New Roman", Times, serif;
+            color: #000;
+            padding: 20px;
+        }
+        h1 { color: #000080; text-decoration: underline; font-style: italic; }
+        .win-panel {
+            border: 2px solid;
+            border-color: #ffffff #808080 #808080 #ffffff;
+            padding: 15px;
+            background: #c0c0c0;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .section-title { font-weight: bold; font-size: 1.2rem; color: #800000; }
+        .list-preview { 
+            background: #fff; 
+            border: 1px inset #808080; 
+            font-size: 0.8rem; 
+            padding: 5px; 
+            margin: 5px 0;
+            max-height: 50px;
+            overflow-y: auto;
+        }
+        button {
+            background: #c0c0c0;
+            border: 2px solid;
+            border-color: #ffffff #404040 #404040 #ffffff;
+            cursor: pointer;
+            padding: 5px 10px;
+            font-weight: bold;
+        }
+        button:active { border-color: #404040 #ffffff #ffffff #404040; }
+        input[type="text"] { border: 2px inset #ffffff; padding: 3px; width: 80%; }
+        #final-result {
+            background: #000080;
+            color: #ffff00;
+            padding: 20px;
+            border: 4px double #ffffff;
+            font-size: 1.5rem;
+            display: none; /* Hidden until generated */
+            margin-top: 20px;
+        }
+        marquee { border: 1px solid #000; background: #fff; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-    <div class="box">
-        <h2>What's the Genre?</h2>
-        <div id="result">Click generate!</div>
-        <button onclick="generateGenre()" style="background: #28a745; color: white; border: none;">Generate Idea</button>
+    <marquee>WELCOME TO THE ULTIMATE GAME IDEA GENERATOR! OPTIMIZED FOR NETSCAPE NAVIGATOR 4.0</marquee>
+    
+    <h1>Game Project Generator</h1>
+
+    <div class="win-panel">
+        <span class="section-title">1. Dimension Type</span><br>
+        <select id="typeSelect">
+            <option value="Text-Based">Text-Based</option>
+            <option value="2D">2D</option>
+            <option value="3D">3D</option>
+        </select>
     </div>
 
-    <div class="box">
-        <h3>Add to the Pool</h3>
-        <input type="text" id="newGenre" placeholder="e.g. Cyberpunk Racing">
-        <button onclick="addGenre()">Add Genre</button>
+    <div class="win-panel">
+        <span class="section-title">2. Genres</span><br>
+        <div class="list-preview" id="genreDisplay"></div>
+        <input type="text" id="genreInput" placeholder="Enter genres separated by commas...">
+        <button onclick="addItems('genre')">Add to List</button>
+        <br><br>
+        <input type="checkbox" id="disableDefaultGenre"> <label for="disableDefaultGenre">Disable Default Genres</label>
     </div>
 
-    <a href="index.html" class="back-link">← Back to Home</a>
+    <div class="win-panel">
+        <span class="section-title">3. Themes</span><br>
+        <div class="list-preview" id="themeDisplay"></div>
+        <input type="text" id="themeInput" placeholder="Space, Horror, Noir...">
+        <button onclick="addItems('theme')">Add to List</button>
+        <br><br>
+        <input type="checkbox" id="disableDefaultTheme"> <label for="disableDefaultTheme">Disable Default Themes</label>
+    </div>
+
+    <button style="font-size: 1.5rem; width: 100%; height: 50px;" onclick="generateIdea()">
+        GENERATE MY GAME IDEA!
+    </button>
+
+    <div id="final-result">
+        *** YOUR GAME IDEA ***<br>
+        <span id="output-text"></span>
+    </div>
+
+    <p align="center">
+        <a href="index.html">Click here to go back to Homepage</a>
+    </p>
 
     <script>
-        // Initial default list
-        let defaultGenres = ["Metroidvania", "Soulslike", "Cozy Farm Sim", "First Person Puzzler", "Bullet Hell"];
-        
-        // Load from LocalStorage or use defaults
-        let genres = JSON.parse(localStorage.getItem('myGenres')) || defaultGenres;
+        // Data
+        let defaultGenres = ["Metroidvania", "Soulslike", "Farm Sim", "Puzzler", "Bullet Hell"];
+        let defaultThemes = ["Cyberpunk", "Medieval", "Underwater", "Deep Space", "Post-Apocalyptic"];
 
-        function generateGenre() {
-            const randomIndex = Math.floor(Math.random() * genres.length);
-            document.getElementById('result').innerText = genres[randomIndex];
-        }
+        let userGenres = JSON.parse(localStorage.getItem('userGenres')) || [];
+        let userThemes = JSON.parse(localStorage.getItem('userThemes')) || [];
 
-        function addGenre() {
-            const input = document.getElementById('newGenre');
-            const val = input.value.trim();
+        // Refresh displays on load
+        updatePreviews();
+
+        function addItems(category) {
+            const input = document.getElementById(category + 'Input');
+            const newItems = input.value.split(',').map(item => item.trim()).filter(item => item !== "");
             
-            if (val) {
-                genres.push(val);
-                localStorage.setItem('myGenres', JSON.stringify(genres)); // Save to browser
-                input.value = "";
-                alert("Added " + val + " to your personal list!");
+            if (category === 'genre') {
+                userGenres = [...userGenres, ...newItems];
+                localStorage.setItem('userGenres', JSON.stringify(userGenres));
+            } else {
+                userThemes = [...userThemes, ...newItems];
+                localStorage.setItem('userThemes', JSON.stringify(userThemes));
             }
+            
+            input.value = "";
+            updatePreviews();
         }
+
+        function updatePreviews() {
+            document.getElementById('genreDisplay').innerText = "Current Pool: " + 
+                ([...(document.getElementById('disableDefaultGenre').checked ? [] : defaultGenres), ...userGenres]).join(', ');
+            
+            document.getElementById('themeDisplay').innerText = "Current Pool: " + 
+                ([...(document.getElementById('disableDefaultTheme').checked ? [] : defaultThemes), ...userThemes]).join(', ');
+        }
+
+        function generateIdea() {
+            const type = document.getElementById('typeSelect').value;
+
+            // Determine Genre Pool
+            const useOnlyUserGenre = document.getElementById('disableDefaultGenre').checked;
+            const genrePool = useOnlyUserGenre ? userGenres : [...defaultGenres, ...userGenres];
+
+            // Determine Theme Pool
+            const useOnlyUserTheme = document.getElementById('disableDefaultTheme').checked;
+            const themePool = useOnlyUserTheme ? userThemes : [...defaultThemes, ...userThemes];
+
+            if (genrePool.length === 0 || themePool.length === 0) {
+                alert("Error: Your lists are empty! Please add or enable some items.");
+                return;
+            }
+
+            const randGenre = genrePool[Math.floor(Math.random() * genrePool.length)];
+            const randTheme = themePool[Math.floor(Math.random() * themePool.length)];
+
+            const resultBox = document.getElementById('final-result');
+            const resultText = document.getElementById('output-text');
+            
+            resultBox.style.display = "block";
+            resultText.innerHTML = `A ${type} ${randGenre} game set in a ${randTheme} world.`;
+        }
+
+        // Add event listeners to checkboxes to update previews instantly
+        document.getElementById('disableDefaultGenre').addEventListener('change', updatePreviews);
+        document.getElementById('disableDefaultTheme').addEventListener('change', updatePreviews);
     </script>
 </body>
 </html>
