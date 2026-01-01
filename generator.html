@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genre Generator</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; text-align: center; }
+        .box { background: white; max-width: 400px; margin: 20px auto; padding: 20px; border-radius: 8px; border: 1px solid #ddd; }
+        #result { font-size: 1.5rem; font-weight: bold; color: #007bff; margin: 20px 0; min-height: 1.6em; }
+        input { padding: 8px; width: 60%; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 8px 15px; margin: 5px; cursor: pointer; }
+        .back-link { display: block; margin-top: 20px; color: #666; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2>What's the Genre?</h2>
+        <div id="result">Click generate!</div>
+        <button onclick="generateGenre()" style="background: #28a745; color: white; border: none;">Generate Idea</button>
+    </div>
+
+    <div class="box">
+        <h3>Add to the Pool</h3>
+        <input type="text" id="newGenre" placeholder="e.g. Cyberpunk Racing">
+        <button onclick="addGenre()">Add Genre</button>
+    </div>
+
+    <a href="index.html" class="back-link">← Back to Home</a>
+
+    <script>
+        // Initial default list
+        let defaultGenres = ["Metroidvania", "Soulslike", "Cozy Farm Sim", "First Person Puzzler", "Bullet Hell"];
+        
+        // Load from LocalStorage or use defaults
+        let genres = JSON.parse(localStorage.getItem('myGenres')) || defaultGenres;
+
+        function generateGenre() {
+            const randomIndex = Math.floor(Math.random() * genres.length);
+            document.getElementById('result').innerText = genres[randomIndex];
+        }
+
+        function addGenre() {
+            const input = document.getElementById('newGenre');
+            const val = input.value.trim();
+            
+            if (val) {
+                genres.push(val);
+                localStorage.setItem('myGenres', JSON.stringify(genres)); // Save to browser
+                input.value = "";
+                alert("Added " + val + " to your personal list!");
+            }
+        }
+    </script>
+</body>
+</html>
