@@ -2,74 +2,114 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dev Logs</title>
+    <title>SYSTEM LOGS // DEV_HUB</title>
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
     <style>
-        body { font-family: sans-serif; line-height: 1.6; color: #333; display: flex; margin: 0; height: 100vh; }
-        
-        /* Sidebar for Navigation */
-        nav { width: 250px; background: #24292e; color: white; padding: 1rem; overflow-y: auto; }
-        nav h2 { font-size: 1.2rem; border-bottom: 1px solid #444; padding-bottom: 10px; }
-        nav ul { list-style: none; padding: 0; }
-        nav li { margin-bottom: 8px; }
-        nav a { color: #adc6ff; text-decoration: none; cursor: pointer; font-size: 0.9rem; }
-        nav a:hover { text-decoration: underline; }
+        /* --- Early 2000s "Classic OS" Aesthetic --- */
+        body { 
+            background-color: #008080; /* Classic Teal Desktop */
+            font-family: "Tahoma", "MS Sans Serif", sans-serif;
+            display: flex; 
+            margin: 0; 
+            height: 100vh;
+            color: #000;
+        }
 
-        /* Main Content Area */
-        main { flex: 1; padding: 2rem; overflow-y: auto; background: #fff; }
-        #log-content { max-width: 800px; margin: 0 auto; }
+        /* Sidebar Window */
+        nav { 
+            width: 280px; 
+            background: #d4d0c8; /* Windows 95 Grey */
+            border-right: 3px outset #fff;
+            padding: 10px;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+        }
+
+        h2 { font-size: 14px; background: #000080; color: white; padding: 3px 6px; margin: -10px -10px 10px -10px; }
+
+        /* Tree Structure Styles */
+        details { margin-left: 15px; margin-top: 5px; }
+        summary { 
+            cursor: pointer; 
+            font-weight: bold; 
+            list-style: none; /* Hide default arrow to use custom ones */
+        }
+        summary::-webkit-details-marker { display: none; }
         
-        /* Basic Markdown Styling */
-        #log-content h1 { border-bottom: 2px solid #eee; }
-        #log-content code { background: #f4f4f4; padding: 2px 4px; border-radius: 4px; }
-        #log-content pre { background: #f4f4f4; padding: 1rem; overflow-x: auto; }
+        /* Custom Folder Icons */
+        summary::before { content: "📁 "; font-weight: normal; }
+        details[open] > summary::before { content: "📂 "; }
+
+        ul { list-style: none; padding-left: 20px; margin: 5px 0; border-left: 1px dotted #888; }
+        li { margin: 4px 0; position: relative; }
+        li::before { content: "── "; color: #888; margin-left: -15px; }
+
+        /* Links */
+        a { color: #0000ee; text-decoration: none; font-size: 12px; cursor: pointer; }
+        a:hover { text-decoration: underline; background: #000080; color: white; }
+
+        /* Main Content "Window" */
+        main { 
+            flex: 1; 
+            padding: 20px; 
+            overflow-y: auto; 
+            background: #fff; 
+            margin: 10px;
+            border: 2px inset #fff; /* Sunken effect */
+        }
+
+        #log-content { max-width: 700px; }
     </style>
 </head>
 <body>
 
     <nav>
-        <h2>Log Archive</h2>
-        <ul>
-            <li>
-                <a hx-get="2026/May/log_3_5_2026.md" 
-                   hx-target="#log-content" 
-                   hx-swap="innerHTML">
-                   May 03, 2026
-                </a>
-            </li>
-            <!-- This is a template, just duplicate this
-            <li>
-                <a hx-get="2026/May/log_3_5_2026.md" 
-                   hx-target="#log-content" 
-                   hx-swap="innerHTML">
-                   May 03, 2026
-                </a>
-            </li>
-            --!>
-            </ul>
-        <hr>
-        <a href="../index.html" style="color: #ff79c6;">← Back Home</a>
+        <h2>EXPLORER: /logs</h2>
+        
+        <details open>
+            <summary>2026</summary>
+            
+            <details open>
+                <summary>May</summary>
+                <ul>
+                    <li>
+                        <a hx-get="2026/May/log_3_5_2026.md" 
+                           hx-target="#log-content" 
+                           hx-swap="innerHTML">
+                           log_3_5_2026.md
+                        </a>
+                    </li>
+                    </ul>
+            </details>
+
+            <details>
+                <summary>June</summary>
+                <ul>
+                    <li><em style="font-size: 10px; color: #666;">No entries yet...</em></li>
+                </ul>
+            </details>
+        </details>
+
+        <div style="margin-top: 20px; border-top: 1px solid #888; padding-top: 10px;">
+            <a href="../index.html">🏠 [Return to Home]</a>
+        </div>
     </nav>
 
     <main>
         <div id="log-content">
-            <p>Select a log from the sidebar to view it.</p>
+            <h1 style="border-bottom: 2px solid #000;">LOG_VIEWER.EXE</h1>
+            <p>Select a file from the explorer on the left to initialize rendering.</p>
         </div>
     </main>
 
     <script>
-        /**
-         * This logic tells HTMX: 
-         * "After you load the text file, run it through the Markdown parser."
-         */
+        // Use HTMX event to parse Markdown after the content is swapped in
         document.body.addEventListener('htmx:afterSwap', function(evt) {
-            const contentDiv = document.getElementById('log-content');
             if (evt.detail.target.id === "log-content") {
-                const rawMarkdown = contentDiv.innerText; // Get raw text
-                contentDiv.innerHTML = marked.parse(rawMarkdown); // Render it
+                const contentDiv = document.getElementById('log-content');
+                const rawMarkdown = contentDiv.innerText;
+                contentDiv.innerHTML = marked.parse(rawMarkdown);
             }
         });
     </script>
