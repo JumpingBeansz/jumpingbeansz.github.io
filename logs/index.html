@@ -5,113 +5,129 @@
     <title>SYSTEM LOGS // DEV_HUB</title>
     <script src="https://unpkg.com/htmx.org@1.9.12"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
     <style>
-        /* --- Early 2000s "Classic OS" Aesthetic --- */
+        /* --- Retro UI Aesthetics --- */
         body { 
-            background-color: #008080; /* Classic Teal Desktop */
-            font-family: "Tahoma", "MS Sans Serif", sans-serif;
-            display: flex; 
-            margin: 0; 
-            height: 100vh;
-            color: #000;
+            background-color: #008080; 
+            font-family: "Tahoma", "Segoe UI", sans-serif;
+            display: flex; margin: 0; height: 100vh; overflow: hidden;
         }
 
-        /* Sidebar Window */
+        /* Sidebar - Windows Explorer Style */
         nav { 
-            width: 280px; 
-            background: #d4d0c8; /* Windows 95 Grey */
-            border-right: 3px outset #fff;
-            padding: 10px;
-            overflow-y: auto;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+            width: 260px; background: #d4d0c8; 
+            border-right: 3px outset #fff; padding: 10px;
+            overflow-y: auto; box-shadow: 2px 0 5px rgba(0,0,0,0.3);
         }
+        h2 { font-size: 13px; background: #000080; color: white; padding: 4px 8px; margin: -10px -10px 10px -10px; font-weight: normal; }
 
-        h2 { font-size: 14px; background: #000080; color: white; padding: 3px 6px; margin: -10px -10px 10px -10px; }
-
-        /* Tree Structure Styles */
-        details { margin-left: 15px; margin-top: 5px; }
-        summary { 
-            cursor: pointer; 
-            font-weight: bold; 
-            list-style: none; /* Hide default arrow to use custom ones */
-        }
+        /* Tree Navigation */
+        details { margin-left: 10px; margin-top: 4px; }
+        summary { cursor: pointer; font-size: 13px; list-style: none; outline: none; }
         summary::-webkit-details-marker { display: none; }
-        
-        /* Custom Folder Icons */
-        summary::before { content: "📁 "; font-weight: normal; }
+        summary::before { content: "📁 "; }
         details[open] > summary::before { content: "📂 "; }
+        
+        ul { list-style: none; padding-left: 18px; margin: 4px 0; border-left: 1px dotted #888; }
+        li { margin: 4px 0; display: flex; align-items: center; }
+        li::before { content: ""; border-bottom: 1px dotted #888; width: 10px; margin-right: 5px; }
 
-        ul { list-style: none; padding-left: 20px; margin: 5px 0; border-left: 1px dotted #888; }
-        li { margin: 4px 0; position: relative; }
-        li::before { content: "── "; color: #888; margin-left: -15px; }
+        a { color: #000; text-decoration: none; font-size: 12px; padding: 2px 4px; }
+        a:hover { background: #000080; color: white; cursor: pointer; }
 
-        /* Links */
-        a { color: #0000ee; text-decoration: none; font-size: 12px; cursor: pointer; }
-        a:hover { text-decoration: underline; background: #000080; color: white; }
-
-        /* Main Content "Window" */
+        /* Main Viewer Window */
         main { 
-            flex: 1; 
-            padding: 20px; 
-            overflow-y: auto; 
-            background: #fff; 
-            margin: 10px;
-            border: 2px inset #fff; /* Sunken effect */
+            flex: 1; margin: 10px; background: #fff; 
+            border: 2px inset #fff; overflow-y: auto; padding: 40px;
         }
 
-        #log-content { max-width: 700px; }
+        /* --- THE FIX: Markdown Content Styling --- */
+        .markdown-body {
+            font-family: "serif"; /* Professional document feel */
+            line-height: 1.6;
+            color: #1a1a1a;
+            text-align: left; /* Ensures # headers don't center if parent is centered */
+        }
+        .markdown-body h1 { border-bottom: 2px solid #333; padding-bottom: 5px; margin-top: 24px; font-size: 2em; }
+        .markdown-body h2 { background: none; color: #333; margin-top: 20px; font-size: 1.5em; padding: 0; }
+        .markdown-body p { margin-bottom: 16px; font-size: 16px; }
+        .markdown-body hr { border: 0; border-top: 1px solid #ccc; margin: 20px 0; }
+        .markdown-body code { background: #f4f4f4; padding: 2px 4px; font-family: monospace; }
     </style>
 </head>
 <body>
 
     <nav>
         <h2>EXPLORER: /logs</h2>
-        
         <details open>
-            <summary>2026</summary>
+            <summary onclick="loadFolder(this)">2026</summary>
             
             <details open>
-                <summary>May</summary>
+                <summary onclick="event.stopPropagation(); loadFolder(this)">May</summary>
                 <ul>
                     <li>
                         <a hx-get="2026/May/log_3_5_2026.md" 
                            hx-target="#log-content" 
-                           hx-swap="innerHTML">
-                           log_3_5_2026.md
-                        </a>
+                           hx-trigger="click"
+                           class="log-link">log_3_5_2026.md</a>
                     </li>
-                    </ul>
-            </details>
-
-            <details>
-                <summary>June</summary>
-                <ul>
-                    <li><em style="font-size: 10px; color: #666;">No entries yet...</em></li>
                 </ul>
             </details>
         </details>
-
-        <div style="margin-top: 20px; border-top: 1px solid #888; padding-top: 10px;">
-            <a href="../index.html">🏠 [Return to Home]</a>
+        <div style="margin-top: 30px; border-top: 1px solid #888; padding-top: 10px;">
+            <a href="../index.html">🏠 [Home]</a>
         </div>
     </nav>
 
     <main>
-        <div id="log-content">
-            <h1 style="border-bottom: 2px solid #000;">LOG_VIEWER.EXE</h1>
-            <p>Select a file from the explorer on the left to initialize rendering.</p>
+        <div id="log-content" class="markdown-body">
+            <h1>LOG_VIEWER.EXE</h1>
+            <p>Select a file or folder to begin.</p>
         </div>
     </main>
 
     <script>
-        // Use HTMX event to parse Markdown after the content is swapped in
+        /**
+         * FIX FOR SINGLE FILES:
+         * We catch the HTMX swap. Since HTMX swaps raw text, we 
+         * grab that raw text, parse it, and update the UI.
+         */
         document.body.addEventListener('htmx:afterSwap', function(evt) {
             if (evt.detail.target.id === "log-content") {
-                const contentDiv = document.getElementById('log-content');
-                const rawMarkdown = contentDiv.innerText;
-                contentDiv.innerHTML = marked.parse(rawMarkdown);
+                const container = evt.detail.target;
+                // Use textContent to ensure we get the raw Markdown without HTML interference
+                const rawMarkdown = container.textContent; 
+                container.innerHTML = marked.parse(rawMarkdown);
             }
         });
+
+        /**
+         * FOLDER COMPILATION LOGIC
+         */
+        async function loadFolder(summaryElement) {
+            // Stop toggle if needed, but here we want it to open AND load
+            const parentDetails = summaryElement.parentElement;
+            const links = parentDetails.querySelectorAll('.log-link');
+            const container = document.getElementById('log-content');
+            
+            if (links.length === 0) return;
+
+            container.innerHTML = "<em>Loading archive...</em>";
+            let combinedMarkdown = `# Archive: ${summaryElement.innerText}\n\n`;
+
+            for (let link of links) {
+                const url = link.getAttribute('hx-get');
+                try {
+                    const response = await fetch(url);
+                    const text = await response.text();
+                    combinedMarkdown += `\n---\n\n### File: ${link.innerText}\n\n${text}\n`;
+                } catch (e) {
+                    combinedMarkdown += `\n\n> Error loading ${link.innerText}\n`;
+                }
+            }
+            container.innerHTML = marked.parse(combinedMarkdown);
+        }
     </script>
 </body>
 </html>
