@@ -14,7 +14,6 @@
             display: flex; margin: 0; height: 100vh; overflow: hidden;
         }
 
-        /* Sidebar - Windows Explorer Style */
         nav { 
             width: 260px; background: #d4d0c8; 
             border-right: 3px outset #fff; padding: 10px;
@@ -22,7 +21,6 @@
         }
         h2 { font-size: 13px; background: #000080; color: white; padding: 4px 8px; margin: -10px -10px 10px -10px; font-weight: normal; }
 
-        /* Tree Navigation */
         details { margin-left: 10px; margin-top: 4px; }
         summary { cursor: pointer; font-size: 13px; list-style: none; outline: none; }
         summary::-webkit-details-marker { display: none; }
@@ -33,27 +31,19 @@
         li { margin: 4px 0; display: flex; align-items: center; }
         li::before { content: ""; border-bottom: 1px dotted #888; width: 10px; margin-right: 5px; }
 
-        a { color: #000; text-decoration: none; font-size: 12px; padding: 2px 4px; }
-        a:hover { background: #000080; color: white; cursor: pointer; }
+        a { color: #000; text-decoration: none; font-size: 12px; padding: 2px 4px; border: 1px solid transparent; }
+        a:hover { background: #000080; color: white; cursor: pointer; border: 1px dotted #fff; }
 
-        /* Main Viewer Window */
         main { 
             flex: 1; margin: 10px; background: #fff; 
             border: 2px inset #fff; overflow-y: auto; padding: 40px;
         }
 
-        /* --- THE FIX: Markdown Content Styling --- */
-        .markdown-body {
-            font-family: "serif"; /* Professional document feel */
-            line-height: 1.6;
-            color: #1a1a1a;
-            text-align: left; /* Ensures # headers don't center if parent is centered */
-        }
-        .markdown-body h1 { border-bottom: 2px solid #333; padding-bottom: 5px; margin-top: 24px; font-size: 2em; }
-        .markdown-body h2 { background: none; color: #333; margin-top: 20px; font-size: 1.5em; padding: 0; }
-        .markdown-body p { margin-bottom: 16px; font-size: 16px; }
+        /* Markdown Styling */
+        .markdown-body { font-family: "Georgia", serif; line-height: 1.6; color: #1a1a1a; text-align: left; }
+        .markdown-body h1 { border-bottom: 2px solid #333; padding-bottom: 5px; }
         .markdown-body hr { border: 0; border-top: 1px solid #ccc; margin: 20px 0; }
-        .markdown-body code { background: #f4f4f4; padding: 2px 4px; font-family: monospace; }
+        .markdown-body pre { background: #f4f4f4; padding: 10px; border: 1px solid #ddd; overflow-x: auto; }
     </style>
 </head>
 <body>
@@ -62,28 +52,12 @@
         <h2>EXPLORER: /logs</h2>
         <details open>
             <summary onclick="loadFolder(this)">2026</summary>
-            
             <details open>
                 <summary onclick="event.stopPropagation(); loadFolder(this)">May</summary>
-                <ul>
-                    <li>
-                        <a hx-get="2026/May/log_3_5_2026.md" 
-                           hx-target="#log-content" 
-                           hx-trigger="click"
-                           class="log-link">log_3_5_2026.md</a>
-                    </li>
-                    <li>
-                        <a hx-get="2026/May/log_4_5_2026.md" 
-                           hx-target="#log-content" 
-                           hx-trigger="click"
-                           class="log-link">log_4_5_2026.md</a>
-                    </li>
-                    <li>
-                        <a hx-get="2026/May/log_5_5_2026.md" 
-                           hx-target="#log-content" 
-                           hx-trigger="click"
-                           class="log-link">log_5_5_2026.md</a>
-                    </li>
+                <ul id="may-list">
+                    <li><a hx-get="2026/May/log_3_5_2026.md" hx-target="#log-content" class="log-link">log_3_5_2026.md</a></li>
+                    <li><a hx-get="2026/May/log_4_5_2026.md" hx-target="#log-content" class="log-link">log_4_5_2026.md</a></li>
+                    <li><a hx-get="2026/May/log_5_5_2026.md" hx-target="#log-content" class="log-link">log_5_5_2026.md</a></li>
                 </ul>
             </details>
         </details>
@@ -95,47 +69,56 @@
     <main>
         <div id="log-content" class="markdown-body">
             <h1>LOG_VIEWER.EXE</h1>
-            <p>Select a file or folder to begin.</p>
+            <p>Select a log file from the tree to view contents.</p>
         </div>
     </main>
 
     <script>
         /**
-         * FIX FOR SINGLE FILES:
-         * We catch the HTMX swap. Since HTMX swaps raw text, we 
-         * grab that raw text, parse it, and update the UI.
+         * 1. THE SINGLE FILE FIX
+         * We use 'htmx:beforeSwap' to intercept the raw text before it 
+         * hits the page. This is much more reliable for Markdown.
          */
-        document.body.addEventListener('htmx:afterSwap', function(evt) {
+        document.body.addEventListener('htmx:beforeSwap', function(evt) {
             if (evt.detail.target.id === "log-content") {
-                const container = evt.detail.target;
-                // Use textContent to ensure we get the raw Markdown without HTML interference
-                const rawMarkdown = container.textContent; 
-                container.innerHTML = marked.parse(rawMarkdown);
+                // Get the raw Markdown text directly from the XHR request
+                const rawMarkdown = evt.detail.xhr.responseText;
+                
+                // If it's a 404, show a nice error
+                if (evt.detail.xhr.status === 404) {
+                    evt.detail.shouldSwap = false;
+                    document.getElementById('log-content').innerHTML = "<h1 style='color:red'>404: FILE_NOT_FOUND</h1><p>The system could not locate this log file. Check if the path is correct.</p>";
+                } else {
+                    // Manually swap the parsed HTML so HTMX doesn't treat MD as HTML
+                    evt.detail.target.innerHTML = marked.parse(rawMarkdown);
+                    evt.detail.shouldSwap = false; // Tell HTMX we handled the swap manually
+                }
             }
         });
 
         /**
-         * FOLDER COMPILATION LOGIC
+         * 2. THE FOLDER COMPILATION FIX
          */
         async function loadFolder(summaryElement) {
-            // Stop toggle if needed, but here we want it to open AND load
             const parentDetails = summaryElement.parentElement;
             const links = parentDetails.querySelectorAll('.log-link');
             const container = document.getElementById('log-content');
             
             if (links.length === 0) return;
 
-            container.innerHTML = "<em>Loading archive...</em>";
+            container.innerHTML = "<h1>COMPILING_ARCHIVE...</h1><p>Please wait while the system retrieves files.</p>";
+            
             let combinedMarkdown = `# Archive: ${summaryElement.innerText}\n\n`;
 
             for (let link of links) {
                 const url = link.getAttribute('hx-get');
                 try {
                     const response = await fetch(url);
+                    if (!response.ok) throw new Error();
                     const text = await response.text();
                     combinedMarkdown += `\n---\n\n### File: ${link.innerText}\n\n${text}\n`;
                 } catch (e) {
-                    combinedMarkdown += `\n\n> Error loading ${link.innerText}\n`;
+                    combinedMarkdown += `\n\n> [!] ERROR: Could not load ${link.innerText}\n`;
                 }
             }
             container.innerHTML = marked.parse(combinedMarkdown);
